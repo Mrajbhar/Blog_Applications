@@ -18,7 +18,7 @@ const postSchema = new mongoose.Schema(
     image: {
       type: String,
       default:
-        'src/Images/pexels-kaboompics-6469.jpg',
+        'https://qph.cf2.quoracdn.net/main-qimg-70af68a2c43bc4373fc1cc3839e58f4f-lq',
     },
     category: {
       type: String,
