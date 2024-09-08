@@ -20,10 +20,10 @@ const postSchema = new mongoose.Schema(
       default:
         'https://qph.cf2.quoracdn.net/main-qimg-70af68a2c43bc4373fc1cc3839e58f4f-lq',
     },
-    category: {
-      type: String,
-      default: 'uncategorized',
-    },
+    // category: {
+    //   type: String,
+    //   default: 'uncategorized',
+    // },
     slug: {
       type: String,
       required: true,

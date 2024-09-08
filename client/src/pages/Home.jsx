@@ -1,5 +1,5 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import PostCard from '../components/PostCard';
 
 export default function Home() {
@@ -7,9 +7,14 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await fetch('/api/post/getPosts');
-      const data = await res.json();
-      setPosts(data.posts);
+      try {
+        const res = await fetch('/api/post/getPosts');
+        if (!res.ok) throw new Error('Failed to fetch posts');
+        const data = await res.json();
+        setPosts(data.posts);
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchPosts();
   }, []);
@@ -45,20 +50,7 @@ export default function Home() {
           {posts && posts.length > 0 ? (
             <div className='grid grid-cols-1 gap-20 sm:grid-cols-2 lg:grid-cols-3'>
               {posts.map((post) => (
-                <div key={post._id} className='relative bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:shadow-2xl hover:scale-105'>
-                  <PostCard post={post} />
-                  <div className='absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-30' />
-                  <div className='relative p-6 z-10'>
-                    <h3 className='text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2'>{post.title}</h3>
-                    <p className='text-gray-600 dark:text-gray-300 mb-4'>{post.excerpt}</p>
-                    <Link
-                      to={`/post/${post._id}`}
-                      className='inline-block bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md transform transition-transform duration-300 hover:scale-105 hover:bg-teal-600'
-                    >
-                      Read More
-                    </Link>
-                  </div>
-                </div>
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
           ) : (
