@@ -4,8 +4,21 @@
 
 body {
   height: 100vh;
+  font-family: 'Open Sans', sans-serif;
+
 }
 
+h1 {
+  font-family: 'Dancing Script', cursive;
+}
+
+h2 {
+  font-family: 'EB Garamond', serif;
+}
+
+h3 {
+  font-family: 'Sofadi One', sans-serif;
+}
 .ql-editor {
   font-size: 1.05rem;
 }
