@@ -2,24 +2,45 @@ import { Link } from 'react-router-dom';
 
 export default function PostCard({ post }) {
   return (
-    <div className='group relative w-full border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[430px] transition-all'>
-      <Link to={`/post/${post.slug}`}>
-        <img
-          src={post.image}
-          alt='post cover'
-          className='h-[260px] w-full  object-cover group-hover:h-[200px] transition-all duration-300 z-20'
-        />
+    <article className='group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900'>
+      {/* Cover image */}
+      <Link to={`/post/${post.slug}`} className='block overflow-hidden'>
+        <div className='relative h-52 w-full overflow-hidden'>
+          <img
+            src={post.image}
+            alt={post.title}
+            loading='lazy'
+            className='h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105'
+          />
+          {post.category && (
+            <span className='absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-slate-700 backdrop-blur dark:bg-slate-900/80 dark:text-slate-200'>
+              {post.category}
+            </span>
+          )}
+        </div>
       </Link>
-      <div className='p-3 flex flex-col gap-2'>
-        <p className='text-lg font-semibold line-clamp-2'>{post.title}</p>
-        <span className='italic text-sm'>{post.category}</span>
+
+      {/* Body */}
+      <div className='flex flex-1 flex-col p-5'>
+        <h3 className='line-clamp-2 font-serif text-xl font-semibold leading-snug tracking-tight'>
+          <Link
+            to={`/post/${post.slug}`}
+            className='transition-colors hover:text-teal-600 dark:hover:text-teal-400'
+          >
+            {post.title}
+          </Link>
+        </h3>
+
         <Link
           to={`/post/${post.slug}`}
-          className='z-10 group-hover:bottom-0 absolute bottom-[-200px] left-0 right-0 border border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white transition-all duration-300 text-center py-2 rounded-md !rounded-tl-none m-2'
+          className='mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-500 dark:text-teal-400'
         >
           Read article
+          <span className='transition-transform duration-300 group-hover:translate-x-1'>
+            &rarr;
+          </span>
         </Link>
       </div>
-    </div>
+    </article>
   );
 }
