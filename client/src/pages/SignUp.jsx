@@ -1,17 +1,20 @@
-import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
+import { Spinner } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { FaBookOpen } from "react-icons/fa";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.email || !formData.password) {
@@ -27,116 +30,148 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (data.success === false) {
+        setLoading(false);
         return setErrorMessage(data.message);
       }
       setLoading(false);
-      if (res.ok) {
-        navigate("/sign-in");
-      }
+      if (res.ok) navigate("/sign-in");
     } catch (error) {
       setErrorMessage(error.message);
       setLoading(false);
     }
   };
+
+  const fields = [
+    {
+      id: "username",
+      label: "Username",
+      type: "text",
+      placeholder: "yourname",
+    },
+    {
+      id: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "name@company.com",
+    },
+    {
+      id: "password",
+      label: "Password",
+      type: "password",
+      placeholder: "••••••••",
+    },
+  ];
+
   return (
-    <div className="min-h-screen mt-20">
-      <div className="flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5">
-        {/* left */}
-        <div className="flex-1">
-          <Link
-            to="/"
-            className="font-bold dark:text-white text-4xl flex items-center space-x-2"
-          >
-            <FaBookOpen className="text-5xl text-gradient" />
-            <span className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-600">
-              View
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 font-sans dark:bg-slate-950">
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-2">
+        {/* Brand panel */}
+        <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-600 to-teal-500 p-10 text-white md:flex">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-12 h-64 w-64 rounded-full bg-black/10 blur-2xl" />
+
+          <Link to="/" className="relative flex items-center gap-2.5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
+              <FaBookOpen className="text-lg" />
             </span>
-            Blog
+            <span className="font-serif text-2xl font-semibold tracking-tight">
+              ViewBlog
+            </span>
           </Link>
-          <p className="text-sm mt-5">
-            <span className="text-lg font-semibold text-gradient bg-clip-text bg-gradient-to-r from-teal-300 via-cyan-500 to-blue-500">
-              Join ViewBlog Today!
-            </span>
-            <br />
-            Create your account to unlock a world of insightful articles,
-            tutorials, and engaging content.
-            <br />
-            Sign up easily with your{" "}
-            <span className="font-semibold text-green-500">
-              username email and password{" "}
-            </span>
-            or use <span className="font-semibold text-blue-500">Google</span>{" "}
-            for a quick start.
-            <br />
-            Already have an account?{" "}
-            <Link
-              to="/sign-in"
-              className="font-semibold text-teal-500 hover:underline"
-            >
-              Sign in{" "}
-            </Link>
-            and continue exploring!
+
+          <div className="relative">
+            <h2 className="font-serif text-3xl font-semibold leading-tight">
+              Join ViewBlog today.
+            </h2>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/80">
+              Create your account to unlock articles, tutorials, and a community
+              built around great writing.
+            </p>
+          </div>
+
+          <p className="relative text-xs text-white/60">
+            &copy; {new Date().getFullYear()} ViewBlog
           </p>
         </div>
-        {/* right */}
 
-        <div className="flex-1">
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <div>
-              <Label value="Your username" />
-              <TextInput
-                type="text"
-                placeholder="Username"
-                id="username"
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <Label value="Your email" />
-              <TextInput
-                type="email"
-                placeholder="name@company.com"
-                id="email"
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <Label value="Your password" />
-              <TextInput
-                type="password"
-                placeholder="Password"
-                id="password"
-                onChange={handleChange}
-              />
-            </div>
-            <Button
+        {/* Form panel */}
+        <div className="p-8 sm:p-10">
+          {/* Compact brand for mobile */}
+          <Link to="/" className="mb-8 flex items-center gap-2.5 md:hidden">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-indigo-500 text-white shadow-md">
+              <FaBookOpen className="text-base" />
+            </span>
+            <span className="font-serif text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+              View<span className="text-teal-600 dark:text-teal-400">Blog</span>
+            </span>
+          </Link>
+
+          <h1 className="font-serif text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+            Create account
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            It only takes a minute to get started.
+          </p>
+
+          <form className="mt-8 flex flex-col gap-5" onSubmit={handleSubmit}>
+            {fields.map((f) => (
+              <div key={f.id}>
+                <label
+                  htmlFor={f.id}
+                  className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300"
+                >
+                  {f.label}
+                </label>
+                <input
+                  type={f.type}
+                  id={f.id}
+                  placeholder={f.placeholder}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all duration-200 focus:border-teal-400 focus:bg-white focus:ring-2 focus:ring-teal-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:bg-slate-800"
+                />
+              </div>
+            ))}
+
+            <button
               type="submit"
-              gradientDuoTone="cyanToBlue"
-              className="text-white font-semibold py-2 px-4 rounded-lg shadow-md transform transition-transform duration-300 hover:scale-105 bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-600"
+              disabled={loading}
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>
                   <Spinner size="sm" />
-                  <span className="pl-3">Loading...</span>
+                  <span>Creating account…</span>
                 </>
               ) : (
                 "Sign Up"
               )}
-            </Button>
+            </button>
+
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+              <span className="text-xs text-slate-400">or</span>
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            </div>
 
             <OAuth />
           </form>
-          <div className="flex gap-2 text-sm mt-5">
-            <span>Have an account?</span>
-            <Link to="/sign-in" className="text-blue-500">
-              Sign In
-            </Link>
-          </div>
+
           {errorMessage && (
-            <Alert className="mt-5" color="failure">
+            <div className="mt-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
+              <HiOutlineExclamationCircle className="shrink-0 text-lg" />
               {errorMessage}
-            </Alert>
+            </div>
           )}
+
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+            Already have an account?{" "}
+            <Link
+              to="/sign-in"
+              className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -1,8 +1,19 @@
-import { Avatar, Dropdown } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon, FaSun, FaBookOpen, FaChevronDown, FaArrowRight } from "react-icons/fa";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
+import {
+  FaMoon,
+  FaSun,
+  FaBookOpen,
+  FaChevronDown,
+  FaArrowRight,
+} from "react-icons/fa";
+import {
+  HiMenuAlt3,
+  HiX,
+  HiOutlineUser,
+  HiOutlineViewGrid,
+  HiOutlineLogout,
+} from "react-icons/hi";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { signoutSuccess } from "../redux/user/userSlice";
@@ -15,9 +26,21 @@ const navItems = [
 ];
 
 const blogCategories = [
-  { to: "/blog/tech", title: "Tech", desc: "Trends in technology and development." },
-  { to: "/blog/lifestyle", title: "Lifestyle", desc: "Tips for a better lifestyle." },
-  { to: "/blog/travel", title: "Travel", desc: "Destinations and experiences." },
+  {
+    to: "/blog/tech",
+    title: "Tech",
+    desc: "Trends in technology and development.",
+  },
+  {
+    to: "/blog/lifestyle",
+    title: "Lifestyle",
+    desc: "Tips for a better lifestyle.",
+  },
+  {
+    to: "/blog/travel",
+    title: "Travel",
+    desc: "Destinations and experiences.",
+  },
 ];
 
 export default function Header() {
@@ -31,9 +54,12 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [blogOpen, setBlogOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
 
   const blogRef = useRef(null);
-  const closeTimer = useRef(null);
+  const userRef = useRef(null);
+  const blogTimer = useRef(null);
+  const userTimer = useRef(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -41,28 +67,36 @@ export default function Header() {
     if (term) setSearchTerm(term);
   }, [location.search]);
 
-  // Close menus on route change
   useEffect(() => {
     setMobileOpen(false);
     setBlogOpen(false);
+    setUserOpen(false);
   }, [path]);
 
-  // Close blog dropdown when clicking outside
   useEffect(() => {
     const onClick = (e) => {
-      if (blogRef.current && !blogRef.current.contains(e.target)) setBlogOpen(false);
+      if (blogRef.current && !blogRef.current.contains(e.target))
+        setBlogOpen(false);
+      if (userRef.current && !userRef.current.contains(e.target))
+        setUserOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  // Hover handlers with a small delay so the menu doesn't flicker
   const openBlog = () => {
-    clearTimeout(closeTimer.current);
+    clearTimeout(blogTimer.current);
     setBlogOpen(true);
   };
   const closeBlog = () => {
-    closeTimer.current = setTimeout(() => setBlogOpen(false), 120);
+    blogTimer.current = setTimeout(() => setBlogOpen(false), 120);
+  };
+  const openUser = () => {
+    clearTimeout(userTimer.current);
+    setUserOpen(true);
+  };
+  const closeUser = () => {
+    userTimer.current = setTimeout(() => setUserOpen(false), 120);
   };
 
   const handleSignout = async () => {
@@ -134,7 +168,7 @@ export default function Header() {
         <nav className="hidden items-center gap-7 lg:flex">
           <NavLink to="/" label="Home" />
 
-          {/* Blogs — hover + click dropdown */}
+          {/* Blogs dropdown */}
           <div
             ref={blogRef}
             className="relative"
@@ -155,8 +189,6 @@ export default function Header() {
                 className={`text-[10px] transition-transform duration-300 ${blogOpen ? "rotate-180" : ""}`}
               />
             </button>
-
-            {/* Panel */}
             <div
               className={`absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 origin-top rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/5 transition-all duration-200 dark:border-slate-800 dark:bg-slate-900 ${
                 blogOpen
@@ -197,25 +229,105 @@ export default function Header() {
             aria-label="Toggle theme"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-all duration-200 hover:rotate-12 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
-            {theme === "light" ? <FaSun className="text-amber-500" /> : <FaMoon className="text-indigo-300" />}
+            {theme === "light" ? (
+              <FaSun className="text-amber-500" />
+            ) : (
+              <FaMoon className="text-indigo-300" />
+            )}
           </button>
 
           {currentUser ? (
-            <Dropdown
-              arrowIcon={false}
-              inline
-              label={<Avatar alt="user" img={currentUser.profilePicture} rounded />}
+            <div
+              ref={userRef}
+              className="relative"
+              onMouseEnter={openUser}
+              onMouseLeave={closeUser}
             >
-              <Dropdown.Header>
-                <span className="block text-sm font-medium">@{currentUser.username}</span>
-                <span className="block truncate text-sm text-slate-500">{currentUser.email}</span>
-              </Dropdown.Header>
-              <Link to="/dashboard?tab=profile">
-                <Dropdown.Item>Profile</Dropdown.Item>
-              </Link>
-              <Dropdown.Divider />
-              <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
-            </Dropdown>
+              <button
+                type="button"
+                onClick={() => setUserOpen((o) => !o)}
+                className="flex items-center gap-1.5 rounded-full p-0.5 transition-transform duration-200 hover:scale-105"
+              >
+                <span className="relative">
+                  <img
+                    src={currentUser.profilePicture}
+                    alt="user"
+                    className="h-9 w-9 rounded-full object-cover ring-2 ring-slate-200 transition-all dark:ring-slate-700"
+                  />
+                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-teal-500 ring-2 ring-white dark:ring-slate-950" />
+                </span>
+                <FaChevronDown
+                  className={`hidden text-[10px] text-slate-400 transition-transform duration-300 sm:block ${userOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* User panel */}
+              <div
+                className={`absolute right-0 top-full z-50 mt-3 w-64 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 transition-all duration-200 dark:border-slate-800 dark:bg-slate-900 ${
+                  userOpen
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible -translate-y-2 opacity-0"
+                }`}
+              >
+                {/* Header */}
+                <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/60">
+                  <img
+                    src={currentUser.profilePicture}
+                    alt="user"
+                    className="h-10 w-10 rounded-full object-cover ring-2 ring-teal-500/30"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        @{currentUser.username}
+                      </p>
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
+                          currentUser.isAdmin
+                            ? "bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-400"
+                            : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {currentUser.isAdmin ? "Admin" : "Member"}
+                      </span>
+                    </div>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                      {currentUser.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Items */}
+                <div className="mt-2 space-y-0.5">
+                  <Link
+                    to="/dashboard?tab=profile"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                  >
+                    <HiOutlineUser className="text-lg text-slate-400" />
+                    Profile
+                  </Link>
+                  {currentUser.isAdmin && (
+                    <Link
+                      to="/dashboard?tab=dash"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                    >
+                      <HiOutlineViewGrid className="text-lg text-slate-400" />
+                      Dashboard
+                    </Link>
+                  )}
+                </div>
+
+                <div className="my-2 h-px bg-slate-100 dark:bg-slate-800" />
+
+                <button
+                  onClick={handleSignout}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/40"
+                >
+                  <HiOutlineLogout className="text-lg" />
+                  Sign out
+                </button>
+              </div>
+            </div>
           ) : (
             <Link
               to="/sign-in"
@@ -231,7 +343,11 @@ export default function Header() {
             aria-label="Toggle menu"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 lg:hidden"
           >
-            {mobileOpen ? <HiX className="text-xl" /> : <HiMenuAlt3 className="text-xl" />}
+            {mobileOpen ? (
+              <HiX className="text-xl" />
+            ) : (
+              <HiMenuAlt3 className="text-xl" />
+            )}
           </button>
         </div>
       </div>
@@ -239,11 +355,36 @@ export default function Header() {
       {/* Mobile menu */}
       <div
         className={`overflow-hidden border-t border-slate-200 transition-all duration-300 dark:border-slate-800 lg:hidden ${
-          mobileOpen ? "max-h-[30rem] opacity-100" : "max-h-0 opacity-0"
+          mobileOpen ? "max-h-[36rem] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="space-y-4 bg-white px-4 py-5 dark:bg-slate-950 sm:px-6">
           <SearchField />
+
+          {/* Mobile user card */}
+          {currentUser && (
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+              <img
+                src={currentUser.profilePicture}
+                alt="user"
+                className="h-10 w-10 rounded-full object-cover ring-2 ring-teal-500/30"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                  @{currentUser.username}
+                </p>
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                  {currentUser.email}
+                </p>
+              </div>
+              <Link
+                to="/dashboard?tab=profile"
+                className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-teal-600 shadow-sm dark:bg-slate-900 dark:text-teal-400"
+              >
+                Profile
+              </Link>
+            </div>
+          )}
 
           <nav className="flex flex-col">
             {navItems.map((item) => (
@@ -274,7 +415,15 @@ export default function Header() {
             ))}
           </nav>
 
-          {!currentUser && (
+          {currentUser ? (
+            <button
+              onClick={handleSignout}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-red-200 py-2.5 text-sm font-semibold text-red-500 transition-colors hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/40"
+            >
+              <HiOutlineLogout className="text-base" />
+              Sign out
+            </button>
+          ) : (
             <Link
               to="/sign-in"
               className="block rounded-full bg-slate-900 py-2.5 text-center text-sm font-semibold text-white dark:bg-white dark:text-slate-900"

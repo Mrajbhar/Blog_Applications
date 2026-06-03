@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   HiAnnotation,
   HiArrowNarrowUp,
   HiDocumentText,
   HiOutlineUserGroup,
-} from 'react-icons/hi';
-import { Button, Table } from 'flowbite-react';
-import { Link } from 'react-router-dom';
+} from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 export default function DashboardComp() {
   const [users, setUsers] = useState([]);
@@ -20,10 +19,11 @@ export default function DashboardComp() {
   const [lastMonthPosts, setLastMonthPosts] = useState(0);
   const [lastMonthComments, setLastMonthComments] = useState(0);
   const { currentUser } = useSelector((state) => state.user);
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch('/api/user/getusers?limit=5');
+        const res = await fetch("/api/user/getusers?limit=5");
         const data = await res.json();
         if (res.ok) {
           setUsers(data.users);
@@ -36,7 +36,7 @@ export default function DashboardComp() {
     };
     const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/post/getposts?limit=5');
+        const res = await fetch("/api/post/getposts?limit=5");
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
@@ -49,7 +49,7 @@ export default function DashboardComp() {
     };
     const fetchComments = async () => {
       try {
-        const res = await fetch('/api/comment/getcomments?limit=5');
+        const res = await fetch("/api/comment/getcomments?limit=5");
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
@@ -66,145 +66,182 @@ export default function DashboardComp() {
       fetchComments();
     }
   }, [currentUser]);
+
+  const stats = [
+    {
+      label: "Total Users",
+      total: totalUsers,
+      last: lastMonthUsers,
+      icon: HiOutlineUserGroup,
+      color: "from-teal-500 to-teal-600",
+    },
+    {
+      label: "Total Comments",
+      total: totalComments,
+      last: lastMonthComments,
+      icon: HiAnnotation,
+      color: "from-indigo-500 to-indigo-600",
+    },
+    {
+      label: "Total Posts",
+      total: totalPosts,
+      last: lastMonthPosts,
+      icon: HiDocumentText,
+      color: "from-amber-500 to-orange-500",
+    },
+  ];
+
+  const card =
+    "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900";
+  const seeAll =
+    "rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-500 hover:text-teal-600 dark:border-slate-700 dark:text-slate-300 dark:hover:text-teal-400";
+  const th =
+    "px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400";
+  const td = "px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300";
+
   return (
-    <div className='p-3 md:mx-auto'>
-      <div className='flex-wrap flex gap-4 justify-center'>
-        <div className='flex flex-col p-3 dark:bg-slate-800 gap-4 md:w-72 w-full rounded-md shadow-md'>
-          <div className='flex justify-between'>
-            <div className=''>
-              <h3 className='text-gray-500 text-md uppercase'>Total Users</h3>
-              <p className='text-2xl'>{totalUsers}</p>
+    <div className="font-sans">
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {stats.map((s) => {
+          const Icon = s.icon;
+          return (
+            <div key={s.label} className={card}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    {s.label}
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">
+                    {s.total}
+                  </p>
+                </div>
+                <span
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${s.color} text-white shadow-md`}
+                >
+                  <Icon className="text-xl" />
+                </span>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <span className="flex items-center font-medium text-teal-500">
+                  <HiArrowNarrowUp />
+                  {s.last}
+                </span>
+                <span className="text-slate-400">last month</span>
+              </div>
             </div>
-            <HiOutlineUserGroup className='bg-teal-600  text-white rounded-full text-5xl p-3 shadow-lg' />
-          </div>
-          <div className='flex  gap-2 text-sm'>
-            <span className='text-green-500 flex items-center'>
-              <HiArrowNarrowUp />
-              {lastMonthUsers}
-            </span>
-            <div className='text-gray-500'>Last month</div>
-          </div>
-        </div>
-        <div className='flex flex-col p-3 dark:bg-slate-800 gap-4 md:w-72 w-full rounded-md shadow-md'>
-          <div className='flex justify-between'>
-            <div className=''>
-              <h3 className='text-gray-500 text-md uppercase'>
-                Total Comments
-              </h3>
-              <p className='text-2xl'>{totalComments}</p>
-            </div>
-            <HiAnnotation className='bg-indigo-600  text-white rounded-full text-5xl p-3 shadow-lg' />
-          </div>
-          <div className='flex  gap-2 text-sm'>
-            <span className='text-green-500 flex items-center'>
-              <HiArrowNarrowUp />
-              {lastMonthComments}
-            </span>
-            <div className='text-gray-500'>Last month</div>
-          </div>
-        </div>
-        <div className='flex flex-col p-3 dark:bg-slate-800 gap-4 md:w-72 w-full rounded-md shadow-md'>
-          <div className='flex justify-between'>
-            <div className=''>
-              <h3 className='text-gray-500 text-md uppercase'>Total Posts</h3>
-              <p className='text-2xl'>{totalPosts}</p>
-            </div>
-            <HiDocumentText className='bg-lime-600  text-white rounded-full text-5xl p-3 shadow-lg' />
-          </div>
-          <div className='flex  gap-2 text-sm'>
-            <span className='text-green-500 flex items-center'>
-              <HiArrowNarrowUp />
-              {lastMonthPosts}
-            </span>
-            <div className='text-gray-500'>Last month</div>
-          </div>
-        </div>
+          );
+        })}
       </div>
-      <div className='flex flex-wrap gap-4 py-3 mx-auto justify-center'>
-        <div className='flex flex-col w-full md:w-auto shadow-md p-2 rounded-md dark:bg-gray-800'>
-          <div className='flex justify-between  p-3 text-sm font-semibold'>
-            <h1 className='text-center p-2'>Recent users</h1>
-            <Button outline gradientDuoTone='purpleToPink'>
-              <Link to={'/dashboard?tab=users'}>See all</Link>
-            </Button>
+
+      {/* Recent tables */}
+      <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-3">
+        {/* Recent users */}
+        <div className={card}>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-serif text-base font-semibold text-slate-900 dark:text-white">
+              Recent users
+            </h2>
+            <Link to="/dashboard?tab=users" className={seeAll}>
+              See all
+            </Link>
           </div>
-          <Table hoverable>
-            <Table.Head>
-              <Table.HeadCell>User image</Table.HeadCell>
-              <Table.HeadCell>Username</Table.HeadCell>
-            </Table.Head>
-            {users &&
-              users.map((user) => (
-                <Table.Body key={user._id} className='divide-y'>
-                  <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
-                    <Table.Cell>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800">
+                  <th className={th}>User</th>
+                  <th className={th}>Username</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td className={td}>
                       <img
                         src={user.profilePicture}
-                        alt='user'
-                        className='w-10 h-10 rounded-full bg-gray-500'
+                        alt="user"
+                        className="h-9 w-9 rounded-full bg-slate-200 object-cover"
                       />
-                    </Table.Cell>
-                    <Table.Cell>{user.username}</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              ))}
-          </Table>
-        </div>
-        <div className='flex flex-col w-full md:w-auto shadow-md p-2 rounded-md dark:bg-gray-800'>
-          <div className='flex justify-between  p-3 text-sm font-semibold'>
-            <h1 className='text-center p-2'>Recent comments</h1>
-            <Button outline gradientDuoTone='purpleToPink'>
-              <Link to={'/dashboard?tab=comments'}>See all</Link>
-            </Button>
+                    </td>
+                    <td className={td}>{user.username}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <Table hoverable>
-            <Table.Head>
-              <Table.HeadCell>Comment content</Table.HeadCell>
-              <Table.HeadCell>Likes</Table.HeadCell>
-            </Table.Head>
-            {comments &&
-              comments.map((comment) => (
-                <Table.Body key={comment._id} className='divide-y'>
-                  <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
-                    <Table.Cell className='w-96'>
-                        <p className='line-clamp-2'>{comment.content}</p>
-                    </Table.Cell>
-                    <Table.Cell>{comment.numberOfLikes}</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              ))}
-          </Table>
         </div>
-        <div className='flex flex-col w-full md:w-auto shadow-md p-2 rounded-md dark:bg-gray-800'>
-          <div className='flex justify-between  p-3 text-sm font-semibold'>
-            <h1 className='text-center p-2'>Recent posts</h1>
-            <Button outline gradientDuoTone='purpleToPink'>
-              <Link to={'/dashboard?tab=posts'}>See all</Link>
-            </Button>
+
+        {/* Recent comments */}
+        <div className={card}>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-serif text-base font-semibold text-slate-900 dark:text-white">
+              Recent comments
+            </h2>
+            <Link to="/dashboard?tab=comments" className={seeAll}>
+              See all
+            </Link>
           </div>
-          <Table hoverable>
-            <Table.Head>
-              <Table.HeadCell>Post image</Table.HeadCell>
-              <Table.HeadCell>Post Title</Table.HeadCell>
-              <Table.HeadCell>Category</Table.HeadCell>
-            </Table.Head>
-            {posts &&
-              posts.map((post) => (
-                <Table.Body key={post._id} className='divide-y'>
-                  <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
-                    <Table.Cell>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800">
+                  <th className={th}>Comment</th>
+                  <th className={th}>Likes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {comments.map((comment) => (
+                  <tr key={comment._id}>
+                    <td className={`${td} max-w-xs`}>
+                      <p className="line-clamp-2">{comment.content}</p>
+                    </td>
+                    <td className={td}>{comment.numberOfLikes}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Recent posts */}
+        <div className={card}>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-serif text-base font-semibold text-slate-900 dark:text-white">
+              Recent posts
+            </h2>
+            <Link to="/dashboard?tab=posts" className={seeAll}>
+              See all
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800">
+                  <th className={th}>Image</th>
+                  <th className={th}>Title</th>
+                  <th className={th}>Category</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {posts.map((post) => (
+                  <tr key={post._id}>
+                    <td className={td}>
                       <img
                         src={post.image}
-                        alt='user'
-                        className='w-14 h-10 rounded-md bg-gray-500'
+                        alt="post"
+                        className="h-9 w-14 rounded-md bg-slate-200 object-cover"
                       />
-                    </Table.Cell>
-                    <Table.Cell className='w-96'>{post.title}</Table.Cell>
-                    <Table.Cell className='w-5'>{post.category}</Table.Cell>
-                  </Table.Row>
-                </Table.Body>
-              ))}
-          </Table>
+                    </td>
+                    <td className={`${td} max-w-[10rem] truncate`}>
+                      {post.title}
+                    </td>
+                    <td className={td}>{post.category}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
