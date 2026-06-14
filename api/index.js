@@ -14,8 +14,10 @@ dotenv.config();
 
 const app = express();
 
-// Trust proxy
-app.set("trust proxy", 1);
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
+app.use(morgan("dev"));
 
 // MongoDB Connection
 mongoose
@@ -27,11 +29,6 @@ mongoose
     console.error("❌ MongoDB Connection Error:", err);
   });
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan("dev"));
-
 // CORS
 const allowedOrigins = [
   process.env.CLIENT_URL,
@@ -40,14 +37,14 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin(origin, callback) {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      callback(new Error("Not allowed by CORS"));
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
@@ -59,7 +56,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-// Health Check
+// Health Route
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
