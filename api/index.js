@@ -31,15 +31,30 @@ mongoose
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(morgan("dev"));
 
+// Allowed Origins
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.CLIENT_URL_PROD,
+];
+
+// CORS Configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://viewblog.vercel.app"],
-    credentials: true,
-  }),
-);
+    origin: function (origin, callback) {
+      // Allow requests with no origin (Postman, mobile apps, etc.)
+      if (!origin) return callback(null, true);
 
-app.use(morgan("dev"));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/api/user", userRoutes);
@@ -51,23 +66,21 @@ app.use("/api/comment", commentRoutes);
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Backend API Running Successfully",
+    message: "Backend API Running Successfully 🚀",
   });
 });
 
-// Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
 
   res.status(statusCode).json({
     success: false,
-    statusCode,
-    message,
+    message: err.message || "Internal Server Error",
   });
 });
 
-// Server Start
+// Start Server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
