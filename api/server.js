@@ -14,7 +14,6 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
@@ -26,19 +25,16 @@ app.use(
   }),
 );
 
-// MongoDB Connection
 mongoose
   .connect(process.env.MONGO)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log("❌ MongoDB Error:", err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
 
-// Routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-// Health Check
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -46,21 +42,4 @@ app.get("/", (req, res) => {
   });
 });
 
-// Error Handler
-app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
-
 export default app;
-
-// Run locally only
-if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 8000;
-
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-}
