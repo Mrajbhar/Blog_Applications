@@ -19,36 +19,18 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO)
-  .then(() => {
-    console.log("✅ MongoDB Connected");
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
-  });
-
-// CORS
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  process.env.CLIENT_URL_PROD,
-];
-
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
-);
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.log("❌ MongoDB Error:", err));
 
 // Routes
 app.use("/api/user", userRoutes);
@@ -56,7 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-// Health Route
+// Health Check
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -72,5 +54,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export for Vercel
 export default app;
+
+// Run locally only
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 8000;
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
